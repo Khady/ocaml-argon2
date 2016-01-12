@@ -1,0 +1,13 @@
+true: safe_string, short_paths
+
+<**/*.ml{,i}>: bin_annot
+
+<src>: include
+<src/argon2.ml{,i}>: package(ctypes result ppx_deriving.std)
+<src/argon2.{cma,cmxa,cmxs}>: custom, package(ctypes ctypes.foreign result ppx_deriving.std)
+
+<examples>: include
+<examples/*.ml>: package(result)
+<examples/*.{native,byte}>: package(ctypes), package(ctypes.foreign), package(result)
+
+<doc/*.docdir>: plugin(doc/plugin.cma)

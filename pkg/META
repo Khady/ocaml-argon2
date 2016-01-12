@@ -1,0 +1,8 @@
+version = "%%VERSION%%"
+description = "OCaml bindings to argon2"
+requires = "ctypes ctypes.foreign result"
+archive(byte) = "argon2.cma"
+archive(byte, plugin) = "argon2.cma"
+archive(native) = "argon2.cmxa"
+archive(native, plugin) = "argon2.cmxs"
+exists_if = "argon2.cma"
