@@ -4,6 +4,7 @@ authors: ["Louis Roché <louis@louisroche.net>"]
 homepage: "https://github.com/Khady/ocaml-argon2"
 dev-repo: "git+https://github.com/Khady/ocaml-argon2.git"
 bug-reports: "https://github.com/Khady/ocaml-argon2/issues"
+version: "dev"
 license: "MIT"
 depends: [
   "ocamlfind" {build}
@@ -11,7 +12,7 @@ depends: [
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign"
   "result"
-  "ppx_deriving"
+  "ppx_deriving" {>= "2.0"}
 ]
 build: [
   "ocaml"
@@ -20,4 +21,4 @@ build: [
   "native-dynlink=%{ocaml-native-dynlink}%"
 ]
 build-doc: [make "doc"]
-available: [ ocaml-version >= "4.01.0" ]
+available: [ ocaml-version >= "4.02.1" ]
