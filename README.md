@@ -8,7 +8,7 @@ Online documentation can be found
 ## Installation
 
 ```
-opam pin add argon2 . -k git
+opam install argon2
 ```
 
 ## Examples
