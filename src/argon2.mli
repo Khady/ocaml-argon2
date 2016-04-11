@@ -6,6 +6,13 @@ module Argon2_type: sig
     | Argon2_i
 end
 
+module Argon2_version: sig
+  type t =
+    | ARGON2_VERSION_10
+    | ARGON2_VERSION_13
+    | ARGON2_VERSION_NUMBER
+end
+
 module Argon2_ErrorCodes: sig
   type t =
     | ARGON2_OK
@@ -41,8 +48,15 @@ module Argon2_ErrorCodes: sig
     | ARGON2_MISSING_ARGS
     | ARGON2_ENCODING_FAIL
     | ARGON2_DECODING_FAIL
+    | ARGON2_THREAD_FAIL
+    | ARGON2_DECODING_LENGTH_FAIL
+    | ARGON2_VERIFY_MISMATCH
     | Other of int
-    [@@deriving show]
+
+  (** Get the associated error message for given error code. *)
+  val message :
+    t ->
+    string
 end
 
 type hash = string
@@ -116,8 +130,9 @@ val hash :
   pwd:string ->
   salt:string ->
   typ:Argon2_type.t ->
-  hash_len:int ->               (* must be int option *)
-  encoded_len:int ->            (* must be int option *)
+  hash_len:int ->               (* TODO: must be int option *)
+  encoded_len:int ->            (* TODO: must be int option *)
+  version:Argon2_version.t ->
   ((hash * encoded), Argon2_ErrorCodes.t) Result.result
 
 (** Verifies a password against an encoded string. *)
@@ -126,3 +141,12 @@ val verify :
   pwd:string ->
   typ:Argon2_type.t ->
   (bool, Argon2_ErrorCodes.t) Result.result
+
+(** Returns the encoded hash length for the given input parameters. *)
+val encoded_len :
+  t_cost:int ->
+  m_cost:int ->
+  parallelism:int ->
+  salt_len:int ->
+  hash_len:int ->
+  int

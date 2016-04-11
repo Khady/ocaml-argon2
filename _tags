@@ -1,4 +1,4 @@
-true: safe_string, short_paths
+true: safe_string, keep_locs, strict_sequence, short_paths, no_alias_deps
 
 <**/*.ml{,i}>: bin_annot
 
@@ -7,7 +7,7 @@ true: safe_string, short_paths
 <src/argon2.{cma,cmxa,cmxs}>: custom, package(ctypes ctypes.foreign result ppx_deriving.std)
 
 <examples>: include
-<examples/*.ml>: package(result)
-<examples/*.{native,byte}>: package(ctypes), package(ctypes.foreign), package(result)
+<examples/*.ml>: package(result ppx_deriving.std)
+<examples/*.{native,byte}>: package(ctypes ctypes.foreign result ppx_deriving.std)
 
 <doc/*.docdir>: plugin(doc/plugin.cma)
