@@ -1,4 +1,4 @@
-(** Ocaml bindings to Argon2.  *)
+(** Ocaml bindings to Argon2. *)
 
 module Argon2_type: sig
   type t =
@@ -60,7 +60,7 @@ module I : sig
     hash_len:int ->
     (hash, Argon2_ErrorCodes.t) Result.result
 
-  (** Hashes a password with Argon2d, producing an encoded hash.  *)
+  (** Hashes a password with Argon2i, producing an encoded hash. *)
   val hash_encoded :
     t_cost:int ->
     m_cost:int ->
@@ -90,7 +90,7 @@ module D : sig
     hash_len:int ->
     (hash, Argon2_ErrorCodes.t) Result.result
 
-  (** Hashes a password with Argon2d, producing an encoded hash.  *)
+  (** Hashes a password with Argon2d, producing an encoded hash. *)
   val hash_encoded :
     t_cost:int ->
     m_cost:int ->
