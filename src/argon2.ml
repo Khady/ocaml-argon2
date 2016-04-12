@@ -347,33 +347,97 @@ let verify verify_fun ~encoded ~pwd =
   | ErrorCodes.OK -> Result.Ok true
   | e -> Result.Error e
 
-module I = struct
+module type HashBindings =
+sig
+  val hash_raw :
+    Unsigned.uint32 ->
+    Unsigned.uint32 ->
+    Unsigned.uint32 ->
+    string ->
+    Unsigned.size_t ->
+    string ->
+    Unsigned.size_t ->
+    unit Ctypes_static.ptr ->
+    Unsigned.size_t ->
+    ErrorCodes.t
+
+  val hash_encoded :
+    Unsigned.uint32 ->
+    Unsigned.uint32 ->
+    Unsigned.uint32 ->
+    string ->
+    Unsigned.size_t ->
+    string ->
+    Unsigned.size_t ->
+    Unsigned.size_t ->
+    char Ctypes_static.ptr ->
+    Unsigned.size_t ->
+    ErrorCodes.t
+
+  val verify :
+    string ->
+    string ->
+    Unsigned.size_t ->
+    ErrorCodes.t
+end
+
+module type HashFunctions =
+sig
+  type hash
+  type encoded
+
+  val hash_raw :
+    t_cost:int ->
+    m_cost:int ->
+    parallelism:int ->
+    pwd:string ->
+    salt:string ->
+    hash_len:int ->
+    (hash, ErrorCodes.t) Result.result
+
+  val hash_encoded :
+    t_cost:int ->
+    m_cost:int ->
+    parallelism:int ->
+    pwd:string ->
+    salt:string ->
+    hash_len:int ->
+    encoded_len:int ->
+    (encoded, ErrorCodes.t) Result.result
+
+  val verify :
+    encoded:encoded ->
+    pwd:string ->
+    (bool, ErrorCodes.t) Result.result
+
+  val hash_to_string : hash -> string
+  val encoded_to_string : encoded -> string
+end
+
+module MakeInternal (H : HashBindings) : HashFunctions =
+struct
   type hash = string
   type encoded = string
 
-  let hash_raw = hash_raw argon2i_hash_raw
-
-  let hash_encoded = hash_encoded argon2i_hash_encoded
-
-  let verify = verify argon2i_verify
-
   let hash_to_string h = h
   let encoded_to_string e = e
+
+  let hash_raw = hash_raw H.hash_raw
+  let hash_encoded = hash_encoded H.hash_encoded
+  let verify = verify H.verify
 end
 
-module D = struct
-  type hash = string
-  type encoded = string
+module I = MakeInternal(struct
+  let hash_raw = argon2i_hash_raw
+  let hash_encoded = argon2i_hash_encoded
+  let verify = argon2i_verify
+end)
 
-  let hash_raw = hash_raw argon2d_hash_raw
-
-  let hash_encoded = hash_encoded argon2d_hash_encoded
-
-  let verify = verify argon2d_verify
-
-  let hash_to_string h = h
-  let encoded_to_string e = e
-end
+module D = MakeInternal(struct
+  let hash_raw = argon2d_hash_raw
+  let hash_encoded = argon2d_hash_encoded
+  let verify = argon2d_verify
+end)
 
 type hash = string
 type encoded = string

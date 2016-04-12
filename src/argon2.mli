@@ -44,9 +44,7 @@ module ErrorCodes: sig
   (** Get the associated error message for given error code. *)
 end
 
-module I : sig
-  (** Bindings to Argon2i. *)
-
+module type HashFunctions = sig
   type hash
   type encoded
 
@@ -84,45 +82,11 @@ module I : sig
   (** Converts an encoded hash to a string. *)
 end
 
-module D : sig
-  (** Bindings for Argon2d. *)
+module I : HashFunctions
+(** Bindings to Argon2i. *)
 
-  type hash
-  type encoded
-
-  val hash_raw :
-    t_cost:int ->
-    m_cost:int ->
-    parallelism:int ->
-    pwd:string ->
-    salt:string ->
-    hash_len:int ->
-    (hash, ErrorCodes.t) Result.result
-  (** Hashes a password with Argon2d, producing a raw hash. *)
-
-  val hash_encoded :
-    t_cost:int ->
-    m_cost:int ->
-    parallelism:int ->
-    pwd:string ->
-    salt:string ->
-    hash_len:int ->
-    encoded_len:int ->
-    (encoded, ErrorCodes.t) Result.result
-  (** Hashes a password with Argon2d, producing an encoded hash. *)
-
-  val verify :
-    encoded:encoded ->
-    pwd:string ->
-    (bool, ErrorCodes.t) Result.result
-  (** Verifies a password against an encoded value. *)
-
-  val hash_to_string : hash -> string
-  (** Converts a raw hash value to a string. *)
-
-  val encoded_to_string : encoded -> string
-  (** Converts an encoded hash to a string. *)
-end
+module D : HashFunctions
+(** Bindings to Argon2d. *)
 
 type hash = string
 type encoded = string
