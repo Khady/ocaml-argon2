@@ -341,6 +341,40 @@ let hash_raw hash_fun ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len =
     Result.Ok hash
   | e -> Result.Error e
 
+let verify verify_fun ~encoded ~pwd =
+  let s_pwd_len = Unsigned.Size_t.of_int @@ String.length pwd in
+  match verify_fun encoded pwd s_pwd_len with
+  | ErrorCodes.OK -> Result.Ok true
+  | e -> Result.Error e
+
+module I = struct
+  type hash = string
+  type encoded = string
+
+  let hash_raw = hash_raw argon2i_hash_raw
+
+  let hash_encoded = hash_encoded argon2i_hash_encoded
+
+  let verify = verify argon2i_verify
+
+  let hash_to_string h = h
+  let encoded_to_string e = e
+end
+
+module D = struct
+  type hash = string
+  type encoded = string
+
+  let hash_raw = hash_raw argon2d_hash_raw
+
+  let hash_encoded = hash_encoded argon2d_hash_encoded
+
+  let verify = verify argon2d_verify
+
+  let hash_to_string h = h
+  let encoded_to_string e = e
+end
+
 type hash = string
 type encoded = string
 
@@ -398,39 +432,3 @@ let encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len =
       u_hash_len
   in
   Unsigned.Size_t.to_int len
-
-module I = struct
-  type hash = string
-  type encoded = string
-
-  let hash_raw = hash_raw argon2i_hash_raw
-
-  let hash_encoded = hash_encoded argon2i_hash_encoded
-
-  let verify ~encoded ~pwd =
-    let s_pwd_len = Unsigned.Size_t.of_int @@ String.length pwd in
-    match argon2i_verify encoded pwd s_pwd_len with
-    | ErrorCodes.OK -> Result.Ok true
-    | e -> Result.Error e
-
-  let hash_to_string h = h
-  let encoded_to_string e = e
-end
-
-module D = struct
-  type hash = string
-  type encoded = string
-
-  let hash_raw = hash_raw argon2d_hash_raw
-
-  let hash_encoded = hash_encoded argon2d_hash_encoded
-
-  let verify ~encoded ~pwd =
-    let s_pwd_len = Unsigned.Size_t.of_int @@ String.length pwd in
-    match argon2d_verify encoded pwd s_pwd_len with
-    | ErrorCodes.OK -> Result.Ok true
-    | e -> Result.Error e
-
-  let hash_to_string h = h
-  let encoded_to_string e = e
-end
