@@ -1,126 +1,140 @@
 (** Ocaml bindings to Argon2. *)
 
-module Argon2_type: sig
+module ErrorCodes: sig
   type t =
-    | Argon2_d
-    | Argon2_i
-end
-
-module Argon2_version: sig
-  type t =
-    | ARGON2_VERSION_10
-    | ARGON2_VERSION_13
-    | ARGON2_VERSION_NUMBER
-end
-
-module Argon2_ErrorCodes: sig
-  type t =
-    | ARGON2_OK
-    | ARGON2_OUTPUT_PTR_NULL
-    | ARGON2_OUTPUT_TOO_SHORT
-    | ARGON2_OUTPUT_TOO_LONG
-    | ARGON2_PWD_TOO_SHORT
-    | ARGON2_PWD_TOO_LONG
-    | ARGON2_SALT_TOO_SHORT
-    | ARGON2_SALT_TOO_LONG
-    | ARGON2_AD_TOO_SHORT
-    | ARGON2_AD_TOO_LONG
-    | ARGON2_SECRET_TOO_SHORT
-    | ARGON2_SECRET_TOO_LONG
-    | ARGON2_TIME_TOO_SMALL
-    | ARGON2_TIME_TOO_LARGE
-    | ARGON2_MEMORY_TOO_LITTLE
-    | ARGON2_MEMORY_TOO_MUCH
-    | ARGON2_LANES_TOO_FEW
-    | ARGON2_LANES_TOO_MANY
-    | ARGON2_PWD_PTR_MISMATCH
-    | ARGON2_SALT_PTR_MISMATCH
-    | ARGON2_SECRET_PTR_MISMATCH
-    | ARGON2_AD_PTR_MISMATCH
-    | ARGON2_MEMORY_ALLOCATION_ERROR
-    | ARGON2_FREE_MEMORY_CBK_NULL
-    | ARGON2_ALLOCATE_MEMORY_CBK_NULL
-    | ARGON2_INCORRECT_PARAMETER
-    | ARGON2_INCORRECT_TYPE
-    | ARGON2_OUT_PTR_MISMATCH
-    | ARGON2_THREADS_TOO_FEW
-    | ARGON2_THREADS_TOO_MANY
-    | ARGON2_MISSING_ARGS
-    | ARGON2_ENCODING_FAIL
-    | ARGON2_DECODING_FAIL
-    | ARGON2_THREAD_FAIL
-    | ARGON2_DECODING_LENGTH_FAIL
-    | ARGON2_VERIFY_MISMATCH
+    | OK
+    | OUTPUT_PTR_NULL
+    | OUTPUT_TOO_SHORT
+    | OUTPUT_TOO_LONG
+    | PWD_TOO_SHORT
+    | PWD_TOO_LONG
+    | SALT_TOO_SHORT
+    | SALT_TOO_LONG
+    | AD_TOO_SHORT
+    | AD_TOO_LONG
+    | SECRET_TOO_SHORT
+    | SECRET_TOO_LONG
+    | TIME_TOO_SMALL
+    | TIME_TOO_LARGE
+    | MEMORY_TOO_LITTLE
+    | MEMORY_TOO_MUCH
+    | LANES_TOO_FEW
+    | LANES_TOO_MANY
+    | PWD_PTR_MISMATCH
+    | SALT_PTR_MISMATCH
+    | SECRET_PTR_MISMATCH
+    | AD_PTR_MISMATCH
+    | MEMORY_ALLOCATION_ERROR
+    | FREE_MEMORY_CBK_NULL
+    | ALLOCATE_MEMORY_CBK_NULL
+    | INCORRECT_PARAMETER
+    | INCORRECT_TYPE
+    | OUT_PTR_MISMATCH
+    | THREADS_TOO_FEW
+    | THREADS_TOO_MANY
+    | MISSING_ARGS
+    | ENCODING_FAIL
+    | DECODING_FAIL
+    | THREAD_FAIL
+    | DECODING_LENGTH_FAIL
+    | VERIFY_MISMATCH
     | Other of int
 
+  val message : t -> string
   (** Get the associated error message for given error code. *)
-  val message :
-    t ->
-    string
+end
+
+module I : sig
+  (** Bindings to Argon2i. *)
+
+  type hash
+  type encoded
+
+  val hash_raw :
+    t_cost:int ->
+    m_cost:int ->
+    parallelism:int ->
+    pwd:string ->
+    salt:string ->
+    hash_len:int ->
+    (hash, ErrorCodes.t) Result.result
+  (** Hashes a password with Argon2i, producing a raw hash. *)
+
+  val hash_encoded :
+    t_cost:int ->
+    m_cost:int ->
+    parallelism:int ->
+    pwd:string ->
+    salt:string ->
+    hash_len:int ->
+    encoded_len:int ->
+    (encoded, ErrorCodes.t) Result.result
+  (** Hashes a password with Argon2i, producing an encoded hash. *)
+
+  val verify :
+    encoded:encoded ->
+    pwd:string ->
+    (bool, ErrorCodes.t) Result.result
+  (** Verifies a password against an encoded string. *)
+
+  val hash_to_string : hash -> string
+  (** Converts a raw hash value to a string. *)
+
+  val encoded_to_string : encoded -> string
+  (** Converts an encoded hash to a string. *)
+end
+
+module D : sig
+  (** Bindings for Argon2d. *)
+
+  type hash
+  type encoded
+
+  val hash_raw :
+    t_cost:int ->
+    m_cost:int ->
+    parallelism:int ->
+    pwd:string ->
+    salt:string ->
+    hash_len:int ->
+    (hash, ErrorCodes.t) Result.result
+  (** Hashes a password with Argon2d, producing a raw hash. *)
+
+  val hash_encoded :
+    t_cost:int ->
+    m_cost:int ->
+    parallelism:int ->
+    pwd:string ->
+    salt:string ->
+    hash_len:int ->
+    encoded_len:int ->
+    (encoded, ErrorCodes.t) Result.result
+  (** Hashes a password with Argon2d, producing an encoded hash. *)
+
+  val verify :
+    encoded:encoded ->
+    pwd:string ->
+    (bool, ErrorCodes.t) Result.result
+  (** Verifies a password against an encoded value. *)
+
+  val hash_to_string : hash -> string
+  (** Converts a raw hash value to a string. *)
+
+  val encoded_to_string : encoded -> string
+  (** Converts an encoded hash to a string. *)
 end
 
 type hash = string
 type encoded = string
 
-module I : sig
+type kind =
+  | D
+  | I
 
-  (** Hashes a password with Argon2i, producing a raw hash. *)
-  val hash_raw :
-    t_cost:int ->
-    m_cost:int ->
-    parallelism:int ->
-    pwd:string ->
-    salt:string ->
-    hash_len:int ->
-    (hash, Argon2_ErrorCodes.t) Result.result
-
-  (** Hashes a password with Argon2i, producing an encoded hash. *)
-  val hash_encoded :
-    t_cost:int ->
-    m_cost:int ->
-    parallelism:int ->
-    pwd:string ->
-    salt:string ->
-    hash_len:int ->
-    encoded_len:int ->
-    (encoded, Argon2_ErrorCodes.t) Result.result
-
-  (** Verifies a password against an encoded string. *)
-  val verify :
-    encoded:encoded ->
-    pwd:string ->
-    (bool, Argon2_ErrorCodes.t) Result.result
-end
-
-module D : sig
-
-  (** Hashes a password with Argon2d, producing a raw hash. *)
-  val hash_raw :
-    t_cost:int ->
-    m_cost:int ->
-    parallelism:int ->
-    pwd:string ->
-    salt:string ->
-    hash_len:int ->
-    (hash, Argon2_ErrorCodes.t) Result.result
-
-  (** Hashes a password with Argon2d, producing an encoded hash. *)
-  val hash_encoded :
-    t_cost:int ->
-    m_cost:int ->
-    parallelism:int ->
-    pwd:string ->
-    salt:string ->
-    hash_len:int ->
-    encoded_len:int ->
-    (encoded, Argon2_ErrorCodes.t) Result.result
-
-  (** Verifies a password against an encoded string. *)
-  val verify :
-    encoded:encoded ->
-    pwd:string ->
-    (bool, Argon2_ErrorCodes.t) Result.result
-end
+type version =
+  | VERSION_10
+  | VERSION_13
+  | VERSION_NUMBER          (** Currently an alias for [VERSION_13] *)
 
 (** Generic function underlying the above ones. *)
 val hash :
@@ -129,18 +143,18 @@ val hash :
   parallelism:int ->
   pwd:string ->
   salt:string ->
-  typ:Argon2_type.t ->
+  kind:kind ->
   hash_len:int ->               (* TODO: must be int option *)
   encoded_len:int ->            (* TODO: must be int option *)
-  version:Argon2_version.t ->
-  ((hash * encoded), Argon2_ErrorCodes.t) Result.result
+  version:version ->
+  ((hash * encoded), ErrorCodes.t) Result.result
 
 (** Verifies a password against an encoded string. *)
 val verify :
   encoded:encoded ->
   pwd:string ->
-  typ:Argon2_type.t ->
-  (bool, Argon2_ErrorCodes.t) Result.result
+  kind:kind ->
+  (bool, ErrorCodes.t) Result.result
 
 (** Returns the encoded hash length for the given input parameters. *)
 val encoded_len :

@@ -5,167 +5,175 @@ let argon2_lib = Dl.dlopen
   ~filename:"libargon2.so"
   ~flags:[Dl.RTLD_NOW; Dl.RTLD_GLOBAL]
 
-module Argon2_type = struct
+module Kind = struct
   type c = int
 
   type t =
-    | Argon2_d
-    | Argon2_i
+    | D
+    | I
 
   let read = function
-    | 0 -> Argon2_d
-    | 1 -> Argon2_i
+    | 0 -> D
+    | 1 -> I
     | _ as e ->
       raise (Invalid_argument (Printf.sprintf "%d is not a valid argon2_type" e))
 
   let write = function
-    | Argon2_d -> 0
-    | Argon2_i -> 1
+    | D -> 0
+    | I -> 1
 
   let t = view int ~read ~write
 end
+type kind = Kind.t =
+  | D
+  | I
 
-module Argon2_version = struct
+module Version = struct
   type c = int
 
   type t =
-    | ARGON2_VERSION_10
-    | ARGON2_VERSION_13
-    | ARGON2_VERSION_NUMBER
+    | VERSION_10
+    | VERSION_13
+    | VERSION_NUMBER
 
   let read = function
-    | 0x10 -> ARGON2_VERSION_10
-    | 0x13 -> ARGON2_VERSION_13
+    | 0x10 -> VERSION_10
+    | 0x13 -> VERSION_13
     | _ as e ->
       raise (Invalid_argument (Printf.sprintf "%d is not a valid argon2_version" e))
 
   let write = function
-    | ARGON2_VERSION_10     -> 0x10
-    | ARGON2_VERSION_13     -> 0x13
-    | ARGON2_VERSION_NUMBER -> 0x13
+    | VERSION_10     -> 0x10
+    | VERSION_13     -> 0x13
+    | VERSION_NUMBER -> 0x13
 
   let t = view int ~read ~write
 end
+type version = Version.t =
+  | VERSION_10
+  | VERSION_13
+  | VERSION_NUMBER
 
-module Argon2_ErrorCodes = struct
+
+module ErrorCodes = struct
   type c = int
 
   type t =
-    | ARGON2_OK
-    | ARGON2_OUTPUT_PTR_NULL
-    | ARGON2_OUTPUT_TOO_SHORT
-    | ARGON2_OUTPUT_TOO_LONG
-    | ARGON2_PWD_TOO_SHORT
-    | ARGON2_PWD_TOO_LONG
-    | ARGON2_SALT_TOO_SHORT
-    | ARGON2_SALT_TOO_LONG
-    | ARGON2_AD_TOO_SHORT
-    | ARGON2_AD_TOO_LONG
-    | ARGON2_SECRET_TOO_SHORT
-    | ARGON2_SECRET_TOO_LONG
-    | ARGON2_TIME_TOO_SMALL
-    | ARGON2_TIME_TOO_LARGE
-    | ARGON2_MEMORY_TOO_LITTLE
-    | ARGON2_MEMORY_TOO_MUCH
-    | ARGON2_LANES_TOO_FEW
-    | ARGON2_LANES_TOO_MANY
-    | ARGON2_PWD_PTR_MISMATCH
-    | ARGON2_SALT_PTR_MISMATCH
-    | ARGON2_SECRET_PTR_MISMATCH
-    | ARGON2_AD_PTR_MISMATCH
-    | ARGON2_MEMORY_ALLOCATION_ERROR
-    | ARGON2_FREE_MEMORY_CBK_NULL
-    | ARGON2_ALLOCATE_MEMORY_CBK_NULL
-    | ARGON2_INCORRECT_PARAMETER
-    | ARGON2_INCORRECT_TYPE
-    | ARGON2_OUT_PTR_MISMATCH
-    | ARGON2_THREADS_TOO_FEW
-    | ARGON2_THREADS_TOO_MANY
-    | ARGON2_MISSING_ARGS
-    | ARGON2_ENCODING_FAIL
-    | ARGON2_DECODING_FAIL
-    | ARGON2_THREAD_FAIL
-    | ARGON2_DECODING_LENGTH_FAIL
-    | ARGON2_VERIFY_MISMATCH
+    | OK
+    | OUTPUT_PTR_NULL
+    | OUTPUT_TOO_SHORT
+    | OUTPUT_TOO_LONG
+    | PWD_TOO_SHORT
+    | PWD_TOO_LONG
+    | SALT_TOO_SHORT
+    | SALT_TOO_LONG
+    | AD_TOO_SHORT
+    | AD_TOO_LONG
+    | SECRET_TOO_SHORT
+    | SECRET_TOO_LONG
+    | TIME_TOO_SMALL
+    | TIME_TOO_LARGE
+    | MEMORY_TOO_LITTLE
+    | MEMORY_TOO_MUCH
+    | LANES_TOO_FEW
+    | LANES_TOO_MANY
+    | PWD_PTR_MISMATCH
+    | SALT_PTR_MISMATCH
+    | SECRET_PTR_MISMATCH
+    | AD_PTR_MISMATCH
+    | MEMORY_ALLOCATION_ERROR
+    | FREE_MEMORY_CBK_NULL
+    | ALLOCATE_MEMORY_CBK_NULL
+    | INCORRECT_PARAMETER
+    | INCORRECT_TYPE
+    | OUT_PTR_MISMATCH
+    | THREADS_TOO_FEW
+    | THREADS_TOO_MANY
+    | MISSING_ARGS
+    | ENCODING_FAIL
+    | DECODING_FAIL
+    | THREAD_FAIL
+    | DECODING_LENGTH_FAIL
+    | VERIFY_MISMATCH
     | Other of int
 
   let read = function
-    | -0  -> ARGON2_OK
-    | -1  -> ARGON2_OUTPUT_PTR_NULL
-    | -2  -> ARGON2_OUTPUT_TOO_SHORT
-    | -3  -> ARGON2_OUTPUT_TOO_LONG
-    | -4  -> ARGON2_PWD_TOO_SHORT
-    | -5  -> ARGON2_PWD_TOO_LONG
-    | -6  -> ARGON2_SALT_TOO_SHORT
-    | -7  -> ARGON2_SALT_TOO_LONG
-    | -8  -> ARGON2_AD_TOO_SHORT
-    | -9  -> ARGON2_AD_TOO_LONG
-    | -10 -> ARGON2_SECRET_TOO_SHORT
-    | -11 -> ARGON2_SECRET_TOO_LONG
-    | -12 -> ARGON2_TIME_TOO_SMALL
-    | -13 -> ARGON2_TIME_TOO_LARGE
-    | -14 -> ARGON2_MEMORY_TOO_LITTLE
-    | -15 -> ARGON2_MEMORY_TOO_MUCH
-    | -16 -> ARGON2_LANES_TOO_FEW
-    | -17 -> ARGON2_LANES_TOO_MANY
-    | -18 -> ARGON2_PWD_PTR_MISMATCH
-    | -19 -> ARGON2_SALT_PTR_MISMATCH
-    | -20 -> ARGON2_SECRET_PTR_MISMATCH
-    | -21 -> ARGON2_AD_PTR_MISMATCH
-    | -22 -> ARGON2_MEMORY_ALLOCATION_ERROR
-    | -23 -> ARGON2_FREE_MEMORY_CBK_NULL
-    | -24 -> ARGON2_ALLOCATE_MEMORY_CBK_NULL
-    | -25 -> ARGON2_INCORRECT_PARAMETER
-    | -26 -> ARGON2_INCORRECT_TYPE
-    | -27 -> ARGON2_OUT_PTR_MISMATCH
-    | -28 -> ARGON2_THREADS_TOO_FEW
-    | -29 -> ARGON2_THREADS_TOO_MANY
-    | -30 -> ARGON2_MISSING_ARGS
-    | -31 -> ARGON2_ENCODING_FAIL
-    | -32 -> ARGON2_DECODING_FAIL
-    | -33 -> ARGON2_THREAD_FAIL
-    | -34 -> ARGON2_DECODING_LENGTH_FAIL
-    | -35 -> ARGON2_VERIFY_MISMATCH
+    | -0         -> OK
+    | -1         -> OUTPUT_PTR_NULL
+    | -2         -> OUTPUT_TOO_SHORT
+    | -3         -> OUTPUT_TOO_LONG
+    | -4         -> PWD_TOO_SHORT
+    | -5         -> PWD_TOO_LONG
+    | -6         -> SALT_TOO_SHORT
+    | -7         -> SALT_TOO_LONG
+    | -8         -> AD_TOO_SHORT
+    | -9         -> AD_TOO_LONG
+    | -10        -> SECRET_TOO_SHORT
+    | -11        -> SECRET_TOO_LONG
+    | -12        -> TIME_TOO_SMALL
+    | -13        -> TIME_TOO_LARGE
+    | -14        -> MEMORY_TOO_LITTLE
+    | -15        -> MEMORY_TOO_MUCH
+    | -16        -> LANES_TOO_FEW
+    | -17        -> LANES_TOO_MANY
+    | -18        -> PWD_PTR_MISMATCH
+    | -19        -> SALT_PTR_MISMATCH
+    | -20        -> SECRET_PTR_MISMATCH
+    | -21        -> AD_PTR_MISMATCH
+    | -22        -> MEMORY_ALLOCATION_ERROR
+    | -23        -> FREE_MEMORY_CBK_NULL
+    | -24        -> ALLOCATE_MEMORY_CBK_NULL
+    | -25        -> INCORRECT_PARAMETER
+    | -26        -> INCORRECT_TYPE
+    | -27        -> OUT_PTR_MISMATCH
+    | -28        -> THREADS_TOO_FEW
+    | -29        -> THREADS_TOO_MANY
+    | -30        -> MISSING_ARGS
+    | -31        -> ENCODING_FAIL
+    | -32        -> DECODING_FAIL
+    | -33        -> THREAD_FAIL
+    | -34        -> DECODING_LENGTH_FAIL
+    | -35        -> VERIFY_MISMATCH
     | _ as other -> Other other
 
   let write = function
-    | ARGON2_OK                       -> 0
-    | ARGON2_OUTPUT_PTR_NULL          -> -1
-    | ARGON2_OUTPUT_TOO_SHORT         -> -2
-    | ARGON2_OUTPUT_TOO_LONG          -> -3
-    | ARGON2_PWD_TOO_SHORT            -> -4
-    | ARGON2_PWD_TOO_LONG             -> -5
-    | ARGON2_SALT_TOO_SHORT           -> -6
-    | ARGON2_SALT_TOO_LONG            -> -7
-    | ARGON2_AD_TOO_SHORT             -> -8
-    | ARGON2_AD_TOO_LONG              -> -9
-    | ARGON2_SECRET_TOO_SHORT         -> -10
-    | ARGON2_SECRET_TOO_LONG          -> -11
-    | ARGON2_TIME_TOO_SMALL           -> -12
-    | ARGON2_TIME_TOO_LARGE           -> -13
-    | ARGON2_MEMORY_TOO_LITTLE        -> -14
-    | ARGON2_MEMORY_TOO_MUCH          -> -15
-    | ARGON2_LANES_TOO_FEW            -> -16
-    | ARGON2_LANES_TOO_MANY           -> -17
-    | ARGON2_PWD_PTR_MISMATCH         -> -18
-    | ARGON2_SALT_PTR_MISMATCH        -> -19
-    | ARGON2_SECRET_PTR_MISMATCH      -> -20
-    | ARGON2_AD_PTR_MISMATCH          -> -21
-    | ARGON2_MEMORY_ALLOCATION_ERROR  -> -22
-    | ARGON2_FREE_MEMORY_CBK_NULL     -> -23
-    | ARGON2_ALLOCATE_MEMORY_CBK_NULL -> -24
-    | ARGON2_INCORRECT_PARAMETER      -> -25
-    | ARGON2_INCORRECT_TYPE           -> -26
-    | ARGON2_OUT_PTR_MISMATCH         -> -27
-    | ARGON2_THREADS_TOO_FEW          -> -28
-    | ARGON2_THREADS_TOO_MANY         -> -19
-    | ARGON2_MISSING_ARGS             -> -30
-    | ARGON2_ENCODING_FAIL            -> -31
-    | ARGON2_DECODING_FAIL            -> -32
-    | ARGON2_THREAD_FAIL              -> -33
-    | ARGON2_DECODING_LENGTH_FAIL     -> -34
-    | ARGON2_VERIFY_MISMATCH          -> -35
-    | Other o                         -> o
+    | OK                       -> 0
+    | OUTPUT_PTR_NULL          -> -1
+    | OUTPUT_TOO_SHORT         -> -2
+    | OUTPUT_TOO_LONG          -> -3
+    | PWD_TOO_SHORT            -> -4
+    | PWD_TOO_LONG             -> -5
+    | SALT_TOO_SHORT           -> -6
+    | SALT_TOO_LONG            -> -7
+    | AD_TOO_SHORT             -> -8
+    | AD_TOO_LONG              -> -9
+    | SECRET_TOO_SHORT         -> -10
+    | SECRET_TOO_LONG          -> -11
+    | TIME_TOO_SMALL           -> -12
+    | TIME_TOO_LARGE           -> -13
+    | MEMORY_TOO_LITTLE        -> -14
+    | MEMORY_TOO_MUCH          -> -15
+    | LANES_TOO_FEW            -> -16
+    | LANES_TOO_MANY           -> -17
+    | PWD_PTR_MISMATCH         -> -18
+    | SALT_PTR_MISMATCH        -> -19
+    | SECRET_PTR_MISMATCH      -> -20
+    | AD_PTR_MISMATCH          -> -21
+    | MEMORY_ALLOCATION_ERROR  -> -22
+    | FREE_MEMORY_CBK_NULL     -> -23
+    | ALLOCATE_MEMORY_CBK_NULL -> -24
+    | INCORRECT_PARAMETER      -> -25
+    | INCORRECT_TYPE           -> -26
+    | OUT_PTR_MISMATCH         -> -27
+    | THREADS_TOO_FEW          -> -28
+    | THREADS_TOO_MANY         -> -19
+    | MISSING_ARGS             -> -30
+    | ENCODING_FAIL            -> -31
+    | DECODING_FAIL            -> -32
+    | THREAD_FAIL              -> -33
+    | DECODING_LENGTH_FAIL     -> -34
+    | VERIFY_MISMATCH          -> -35
+    | Other o                  -> o
 
   let t = view int ~read ~write
 
@@ -189,7 +197,7 @@ let argon2i_hash_encoded =
      @-> size_t                 (* hashlen *)
      @-> ptr char               (* encoded *)
      @-> size_t                 (* encodedlen *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> returning ErrorCodes.t)
 
 let argon2i_hash_raw =
   foreign ~from:argon2_lib "argon2i_hash_raw"
@@ -202,7 +210,7 @@ let argon2i_hash_raw =
      @-> size_t                 (* saltlen *)
      @-> ptr void               (* hash *)
      @-> size_t                 (* hashlen *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> returning ErrorCodes.t)
 
 let argon2d_hash_encoded =
   foreign ~from:argon2_lib "argon2d_hash_encoded"
@@ -216,7 +224,7 @@ let argon2d_hash_encoded =
      @-> size_t                 (* hashlen *)
      @-> ptr char               (* encoded *)
      @-> size_t                 (* encodedlen *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> returning ErrorCodes.t)
 
 let argon2d_hash_raw =
   foreign ~from:argon2_lib "argon2d_hash_raw"
@@ -229,7 +237,7 @@ let argon2d_hash_raw =
      @-> size_t                 (* saltlen *)
      @-> ptr void               (* hash *)
      @-> size_t                 (* hashlen *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> returning ErrorCodes.t)
 
 let argon2_hash =
   foreign ~from:argon2_lib "argon2_hash"
@@ -244,31 +252,31 @@ let argon2_hash =
      @-> size_t                 (* hashlen *)
      @-> ptr char               (* encoded *)
      @-> size_t                 (* encodedlen *)
-     @-> Argon2_type.t          (* type *)
-     @-> Argon2_version.t       (* version *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> Kind.t                 (* type *)
+     @-> Version.t              (* version *)
+     @-> returning ErrorCodes.t)
 
 let argon2i_verify =
   foreign ~from:argon2_lib "argon2i_verify"
     (string                     (* encoded *)
      @-> string                 (* pwd *)
      @-> size_t                 (* pwdlen *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> returning ErrorCodes.t)
 
 let argon2d_verify =
   foreign ~from:argon2_lib "argon2d_verify"
     (string                     (* encoded *)
      @-> string                 (* pwd *)
      @-> size_t                 (* pwdlen *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> returning ErrorCodes.t)
 
 let argon2_verify =
   foreign ~from:argon2_lib "argon2_verify"
     (string                     (* encoded *)
      @-> string                 (* pwd *)
      @-> size_t                 (* pwdlen *)
-     @-> Argon2_type.t          (* type *)
-     @-> returning Argon2_ErrorCodes.t)
+     @-> Kind.t                 (* type *)
+     @-> returning ErrorCodes.t)
 
 let argon2_encodedlen =
   foreign ~from:argon2_lib "argon2_encodedlen"
@@ -278,9 +286,6 @@ let argon2_encodedlen =
      @-> uint32_t               (* saltlen *)
      @-> uint32_t               (* hashlen *)
      @-> returning size_t)
-
-type hash = string
-type encoded = string
 
 let hash_encoded hash_fun
     ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len ~encoded_len =
@@ -306,7 +311,7 @@ let hash_encoded hash_fun
       s_hash_len
       encoded s_encoded_len
   with
-  | Argon2_ErrorCodes.ARGON2_OK ->
+  | ErrorCodes.OK ->
     let encoded = string_from_ptr encoded encoded_len in
     Result.Ok encoded
   | e -> Result.Error e
@@ -331,12 +336,15 @@ let hash_raw hash_fun ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len =
       salt s_salt_len
       hash s_hash_len
   with
-  | Argon2_ErrorCodes.ARGON2_OK ->
+  | ErrorCodes.OK ->
     let hash = string_from_ptr (from_voidp char hash) hash_len in
     Result.Ok hash
   | e -> Result.Error e
 
-let hash ~t_cost ~m_cost ~parallelism ~pwd ~salt ~typ ~hash_len ~encoded_len ~version =
+type hash = string
+type encoded = string
+
+let hash ~t_cost ~m_cost ~parallelism ~pwd ~salt ~kind ~hash_len ~encoded_len ~version =
   let u_t_cost = Unsigned.UInt32.of_int t_cost in
   let u_m_cost = Unsigned.UInt32.of_int m_cost in
   let u_parallelism = Unsigned.UInt32.of_int parallelism in
@@ -359,20 +367,20 @@ let hash ~t_cost ~m_cost ~parallelism ~pwd ~salt ~typ ~hash_len ~encoded_len ~ve
       salt s_salt_len
       hash s_hash_len
       encoded s_encoded_len
-      typ
+      kind
       version
   in
   match res with
-  | Argon2_ErrorCodes.ARGON2_OK ->
+  | ErrorCodes.OK ->
     let hash = string_from_ptr (from_voidp char hash) hash_len in
     let encoded = string_from_ptr encoded encoded_len in
     Result.Ok (hash, encoded)
   | _ as e -> Result.Error e
 
-let verify ~encoded ~pwd ~typ =
+let verify ~encoded ~pwd ~kind =
   let s_pwd_len = Unsigned.Size_t.of_int @@ String.length pwd in
-  match argon2_verify encoded pwd s_pwd_len typ with
-  | Argon2_ErrorCodes.ARGON2_OK -> Result.Ok true
+  match argon2_verify encoded pwd s_pwd_len kind with
+  | ErrorCodes.OK -> Result.Ok true
   | e -> Result.Error e
 
 let encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len =
@@ -392,6 +400,9 @@ let encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len =
   Unsigned.Size_t.to_int len
 
 module I = struct
+  type hash = string
+  type encoded = string
+
   let hash_raw = hash_raw argon2i_hash_raw
 
   let hash_encoded = hash_encoded argon2i_hash_encoded
@@ -399,11 +410,17 @@ module I = struct
   let verify ~encoded ~pwd =
     let s_pwd_len = Unsigned.Size_t.of_int @@ String.length pwd in
     match argon2i_verify encoded pwd s_pwd_len with
-    | Argon2_ErrorCodes.ARGON2_OK -> Result.Ok true
+    | ErrorCodes.OK -> Result.Ok true
     | e -> Result.Error e
+
+  let hash_to_string h = h
+  let encoded_to_string e = e
 end
 
 module D = struct
+  type hash = string
+  type encoded = string
+
   let hash_raw = hash_raw argon2d_hash_raw
 
   let hash_encoded = hash_encoded argon2d_hash_encoded
@@ -411,6 +428,9 @@ module D = struct
   let verify ~encoded ~pwd =
     let s_pwd_len = Unsigned.Size_t.of_int @@ String.length pwd in
     match argon2d_verify encoded pwd s_pwd_len with
-    | Argon2_ErrorCodes.ARGON2_OK -> Result.Ok true
+    | ErrorCodes.OK -> Result.Ok true
     | e -> Result.Error e
+
+  let hash_to_string h = h
+  let encoded_to_string e = e
 end
