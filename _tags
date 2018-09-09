@@ -9,5 +9,3 @@ true: safe_string, keep_locs, strict_sequence, short_paths, no_alias_deps
 <examples>: include
 <examples/*.ml>: package(result ppx_deriving.std)
 <examples/*.{native,byte}>: package(ctypes ctypes.foreign result ppx_deriving.std)
-
-<doc/*.docdir>: plugin(doc/plugin.cma)
