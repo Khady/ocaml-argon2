@@ -1,6 +1,6 @@
 true: safe_string, keep_locs, strict_sequence, short_paths, no_alias_deps
 
-<**/*.ml{,i}>: bin_annot
+true: bin_annot
 
 <src>: include
 <src/argon2.ml{,i}>: package(ctypes result ppx_deriving.std)
