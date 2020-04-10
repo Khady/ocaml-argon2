@@ -7,9 +7,9 @@ let () =
   let parallelism = 1 in
   let salt = "0000000000000000" in
   let salt_len = String.length salt in
-  let password = "password" in
-  let encoded_len = encoded_len t_cost m_cost parallelism salt_len hash_len in
-  begin match I.hash_raw t_cost m_cost parallelism password salt hash_len with
+  let pwd = "password" in
+  let encoded_len = encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len in
+  begin match I.hash_raw ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len with
     | Result.Ok hash ->
       Printf.printf "argon2i hash:\n";
       I.hash_to_string hash
@@ -19,7 +19,7 @@ let () =
       Printf.printf "Error while computing hash with argon2i_hash_raw: %s\n"
         (ErrorCodes.message e)
   end;
-  begin match D.hash_raw t_cost m_cost parallelism password salt hash_len with
+  begin match D.hash_raw ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len with
     | Result.Ok hash ->
       Printf.printf "argon2d hash:\n";
       D.hash_to_string hash
@@ -30,8 +30,9 @@ let () =
         (ErrorCodes.message e)
   end;
   begin
-    match hash t_cost m_cost parallelism password salt
-            D hash_len encoded_len VERSION_NUMBER
+    match hash ~t_cost ~m_cost ~parallelism ~pwd ~salt
+            ~kind:D ~hash_len ~encoded_len
+            ~version:VERSION_NUMBER
     with
     | Result.Ok (hash, encoded) ->
       Printf.printf "hash argon2d:\n";
@@ -41,7 +42,7 @@ let () =
       String.iter (fun c -> Printf.printf "%02x" (Char.code c)) encoded;
       Printf.printf "\n";
       begin
-        match verify encoded "password" D with
+        match verify ~encoded ~pwd ~kind:D with
         | Result.Ok _ -> Printf.printf "verify OK\n"
         | Result.Error e ->
           Printf.printf "Error while computing verify: %s\n"
