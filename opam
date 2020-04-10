@@ -12,7 +12,6 @@ depends: [
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign"
   "result"
-  "ppx_deriving" {>= "2.0"}
 ]
 build: [[ "ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{pinned}%" ]]
 build-doc: [make "doc"]

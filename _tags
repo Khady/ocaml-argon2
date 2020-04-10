@@ -3,9 +3,9 @@ true: safe_string, keep_locs, strict_sequence, short_paths, no_alias_deps
 true: bin_annot
 
 <src>: include
-<src/argon2.ml{,i}>: package(ctypes result ppx_deriving.std)
-<src/argon2.{cma,cmxa,cmxs}>: custom, package(ctypes ctypes.foreign result ppx_deriving.std)
+<src/argon2.ml{,i}>: package(ctypes result)
+<src/argon2.{cma,cmxa,cmxs}>: custom, package(ctypes ctypes.foreign result)
 
 <examples>: include
-<examples/*.ml>: package(result ppx_deriving.std)
-<examples/*.{native,byte}>: package(ctypes ctypes.foreign result ppx_deriving.std)
+<examples/*.ml>: package(result)
+<examples/*.{native,byte}>: package(ctypes ctypes.foreign result)
