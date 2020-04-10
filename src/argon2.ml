@@ -2,7 +2,7 @@ open Ctypes
 open Foreign
 
 let argon2_lib = Dl.dlopen
-  ~filename:"libargon2.so"
+  ~filename:"libargon2.so.1"
   ~flags:[Dl.RTLD_NOW; Dl.RTLD_GLOBAL]
 
 module Kind = struct
@@ -279,6 +279,7 @@ let argon2_encodedlen =
      @-> uint32_t               (* parallelism *)
      @-> uint32_t               (* saltlen *)
      @-> uint32_t               (* hashlen *)
+     @-> Kind.t                 (* type *)
      @-> returning size_t)
 
 let hash_encoded hash_fun
@@ -488,5 +489,6 @@ let encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len =
       u_parallelism
       u_salt_len
       u_hash_len
+      Kind.D (* No difference between Kind.D and Kind.I *)
   in
   Unsigned.Size_t.to_int len
