@@ -6,8 +6,6 @@ let argon2_lib = Dl.dlopen
   ~flags:[Dl.RTLD_NOW; Dl.RTLD_GLOBAL]
 
 module Kind = struct
-  type c = int
-
   type t =
     | D
     | I
@@ -29,8 +27,6 @@ type kind = Kind.t =
   | I
 
 module Version = struct
-  type c = int
-
   type t =
     | VERSION_10
     | VERSION_13
@@ -56,8 +52,6 @@ type version = Version.t =
 
 
 module ErrorCodes = struct
-  type c = int
-
   type t =
     | OK
     | OUTPUT_PTR_NULL
