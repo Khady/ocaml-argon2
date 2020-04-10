@@ -306,7 +306,7 @@ let hash_encoded hash_fun
       encoded s_encoded_len
   with
   | ErrorCodes.OK ->
-    let encoded = string_from_ptr encoded encoded_len in
+    let encoded = string_from_ptr encoded ~length:encoded_len in
     Result.Ok encoded
   | e -> Result.Error e
 
@@ -331,7 +331,7 @@ let hash_raw hash_fun ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len =
       hash s_hash_len
   with
   | ErrorCodes.OK ->
-    let hash = string_from_ptr (from_voidp char hash) hash_len in
+    let hash = string_from_ptr (from_voidp char hash) ~length:hash_len in
     Result.Ok hash
   | e -> Result.Error e
 
@@ -464,8 +464,8 @@ let hash ~t_cost ~m_cost ~parallelism ~pwd ~salt ~kind ~hash_len ~encoded_len ~v
   in
   match res with
   | ErrorCodes.OK ->
-    let hash = string_from_ptr (from_voidp char hash) hash_len in
-    let encoded = string_from_ptr encoded encoded_len in
+    let hash = string_from_ptr (from_voidp char hash) ~length:hash_len in
+    let encoded = string_from_ptr encoded ~length:encoded_len in
     Result.Ok (hash, encoded)
   | _ as e -> Result.Error e
 
