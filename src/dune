@@ -1,0 +1,5 @@
+(library
+ (name argon2)
+ (public_name argon2)
+ (libraries result ctypes.foreign ctypes)
+ (synopsis "OCaml bindings to argon2"))

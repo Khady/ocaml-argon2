@@ -1,7 +1,0 @@
-B _build/*
-
-PKG ctypes
-PKG ctypes.foreign
-PKG result
-PKG ppx_deriving.std
-PKG ocamlbuild

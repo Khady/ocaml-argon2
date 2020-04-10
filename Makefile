@@ -1,24 +1,20 @@
 # Makefile used for development
 
-OB=ocamlbuild -tag debug -classic-display -use-ocamlfind
-ODOCFLAGS=-docflags -colorize-code,-charset,utf8
+DUNE=dune
 
 lib:
-	$(OB) argon2.cma argon2.cmxa
+	$(DUNE) build @install
 
-examples: lib
-	$(OB) examples.otarget
+.PHONY: examples
+examples:
+	$(DUNE) exec -- examples/examples.exe
 
-plugin:
-	$(OB) -cflags -I,+ocamldoc -package compiler-libs doc/plugin.cmxs
-
-doc: lib plugin
-	$(OB) $(ODOCFLAGS) doc/api.docdir/index.html
-	cp doc/style.css _build/doc/api.docdir/style.css
+doc:
+	$(DUNE) build @doc
 
 upload_doc: doc
-	git checkout gh-pages && rm -rf dev/* && cp api.docdir/* dev && \
+	git checkout gh-pages && rm -rf dev/* && cp -r _build/default/_doc/_html/argon2/* dev && \
 	git add --all dev
 
 clean:
-	$(OB) -clean
+	$(DUNE) clean

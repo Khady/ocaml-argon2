@@ -6,16 +6,14 @@ dev-repo: "git+https://github.com/Khady/ocaml-argon2.git"
 bug-reports: "https://github.com/Khady/ocaml-argon2/issues"
 license: "MIT"
 depends: [
-  "ocaml" {>= "4.02.1"}
-  "ocamlfind" {build}
-  "ocamlbuild" {build}
-  "topkg" {build & >= "0.9.0"}
+  "ocaml" {>= "4.02.3"}
+  "dune"
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign"
   "result"
 ]
 build: [
-  ["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{pinned}%"]
-  [make "doc"] {with-doc}
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs "@install" "@doc" {with-doc}]
 ]
 synopsis: "OCaml bindings to Argon2"
