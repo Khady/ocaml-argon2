@@ -1,11 +1,12 @@
-opam-version: "1.2"
+opam-version: "2.0"
 maintainer: "Louis Roché <louis@louisroche.net>"
-authors: ["Louis Roché <louis@louisroche.net>"]
+authors: "Louis Roché <louis@louisroche.net>"
 homepage: "https://github.com/Khady/ocaml-argon2"
 dev-repo: "git+https://github.com/Khady/ocaml-argon2.git"
 bug-reports: "https://github.com/Khady/ocaml-argon2/issues"
 license: "MIT"
 depends: [
+  "ocaml" {>= "4.02.1"}
   "ocamlfind" {build}
   "ocamlbuild" {build}
   "topkg" {build & >= "0.9.0"}
@@ -13,6 +14,8 @@ depends: [
   "ctypes-foreign"
   "result"
 ]
-build: [[ "ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{pinned}%" ]]
-build-doc: [make "doc"]
-available: [ ocaml-version >= "4.02.1" ]
+build: [
+  ["ocaml" "pkg/pkg.ml" "build" "--dev-pkg" "%{pinned}%"]
+  [make "doc"] {with-doc}
+]
+synopsis: "OCaml bindings to Argon2"
