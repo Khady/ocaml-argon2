@@ -4,6 +4,7 @@
 - change build system to dune (#3)
 - ocamlformat sources
 - support argon2id
+- add tests
 
 ## 0.2 (2016-04-12)
 

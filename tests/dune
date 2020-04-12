@@ -1,0 +1,3 @@
+(tests
+ (names argon2d argon2i argon2id generic)
+ (libraries argon2))

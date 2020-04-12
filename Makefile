@@ -24,3 +24,9 @@ clean:
 
 dev:
 	$(DUNE) build @all @fmt --auto-promote --watch
+
+test:
+	$(DUNE) runtest
+
+test-promote:
+	$(DUNE) runtest --auto-promote
