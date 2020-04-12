@@ -11,6 +11,7 @@ depends: [
   "ctypes" {>= "0.4.1"}
   "ctypes-foreign"
   "result"
+  "odoc" {with-doc}
 ]
 build: [
   ["dune" "subst"] {pinned}
