@@ -3,7 +3,7 @@
 Bindings to [Argon2](https://github.com/P-H-C/phc-winner-argon2).
 
 Online documentation can be found
-[here](http://khady.github.io/ocaml-argon2/dev/Argon2.html)
+[here](http://khady.github.io/ocaml-argon2/dev/Argon2/index.html)
 
 ## Installation
 

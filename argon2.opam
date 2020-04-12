@@ -1,0 +1,19 @@
+opam-version: "2.0"
+maintainer: "Louis Roché <louis@louisroche.net>"
+authors: "Louis Roché <louis@louisroche.net>"
+homepage: "https://github.com/Khady/ocaml-argon2"
+dev-repo: "git+https://github.com/Khady/ocaml-argon2.git"
+bug-reports: "https://github.com/Khady/ocaml-argon2/issues"
+license: "MIT"
+depends: [
+  "ocaml" {>= "4.02.3"}
+  "dune"
+  "ctypes" {>= "0.4.1"}
+  "ctypes-foreign"
+  "result"
+]
+build: [
+  ["dune" "subst"] {pinned}
+  ["dune" "build" "-p" name "-j" jobs "@install" "@doc" {with-doc}]
+]
+synopsis: "OCaml bindings to Argon2"
