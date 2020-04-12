@@ -1,7 +1,7 @@
 (executable
-  (name examples)
-  (libraries argon2))
+ (name examples)
+ (libraries argon2))
 
 (install
-  (section doc)
-  (files examples.ml))
+ (section doc)
+ (files examples.ml))

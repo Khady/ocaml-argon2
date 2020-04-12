@@ -1,6 +1,6 @@
 (** Ocaml bindings to Argon2. *)
 
-module ErrorCodes: sig
+module ErrorCodes : sig
   type t =
     | OK
     | OUTPUT_PTR_NULL
@@ -46,6 +46,7 @@ end
 
 module type HashFunctions = sig
   type hash
+
   type encoded
 
   val hash_raw :
@@ -70,9 +71,7 @@ module type HashFunctions = sig
   (** Hashes a password with Argon2i, producing an encoded hash. *)
 
   val verify :
-    encoded:encoded ->
-    pwd:string ->
-    (bool, ErrorCodes.t) Result.result
+    encoded:encoded -> pwd:string -> (bool, ErrorCodes.t) Result.result
   (** Verifies a password against an encoded string. *)
 
   val hash_to_string : hash -> string
@@ -82,25 +81,23 @@ module type HashFunctions = sig
   (** Converts an encoded hash to a string. *)
 end
 
-module I : HashFunctions
 (** Bindings to Argon2i. *)
+module I : HashFunctions
 
-module D : HashFunctions
 (** Bindings to Argon2d. *)
+module D : HashFunctions
 
 type hash = string
+
 type encoded = string
 
-type kind =
-  | D
-  | I
+type kind = D | I
 
 type version =
   | VERSION_10
   | VERSION_13
-  | VERSION_NUMBER          (** Currently an alias for [VERSION_13] *)
+  | VERSION_NUMBER  (** Currently an alias for [VERSION_13] *)
 
-(** Generic function underlying the above ones. *)
 val hash :
   t_cost:int ->
   m_cost:int ->
@@ -108,19 +105,21 @@ val hash :
   pwd:string ->
   salt:string ->
   kind:kind ->
-  hash_len:int ->               (* TODO: must be int option *)
-  encoded_len:int ->            (* TODO: must be int option *)
+  hash_len:int ->
+  (* TODO: must be int option *)
+  encoded_len:int ->
+  (* TODO: must be int option *)
   version:version ->
-  ((hash * encoded), ErrorCodes.t) Result.result
+  (hash * encoded, ErrorCodes.t) Result.result
+(** Generic function underlying the above ones. *)
 
-(** Verifies a password against an encoded string. *)
 val verify :
   encoded:encoded ->
   pwd:string ->
   kind:kind ->
   (bool, ErrorCodes.t) Result.result
+(** Verifies a password against an encoded string. *)
 
-(** Returns the encoded hash length for the given input parameters. *)
 val encoded_len :
   t_cost:int ->
   m_cost:int ->
@@ -128,3 +127,4 @@ val encoded_len :
   salt_len:int ->
   hash_len:int ->
   int
+(** Returns the encoded hash length for the given input parameters. *)
