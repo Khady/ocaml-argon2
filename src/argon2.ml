@@ -5,19 +5,30 @@ let argon2_lib =
   Dl.dlopen ~filename:"libargon2.so.1" ~flags:[ Dl.RTLD_NOW; Dl.RTLD_GLOBAL ]
 
 module Kind = struct
-  type t = D | I
+  type t = D | I | ID
 
   let read = function
     | 0 -> D
     | 1 -> I
+    | 2 -> ID
     | _ as e -> invalid_arg (Printf.sprintf "%d is not a valid argon2_type" e)
 
-  let write = function D -> 0 | I -> 1
+  let write = function D -> 0 | I -> 1 | ID -> 2
 
   let t = view int ~read ~write
+
+  let argon2_type2string =
+    foreign ~from:argon2_lib "argon2_type2string"
+      (t (* type *) @-> int (* uppercase *) @-> returning string)
+
+  let show (case : [ `Upper | `Lower ]) t =
+    let case = match case with `Upper -> 1 | `Lower -> 0 in
+    argon2_type2string t case
 end
 
-type kind = Kind.t = D | I
+type kind = Kind.t = D | I | ID
+
+let show_kind = Kind.show
 
 module Version = struct
   type t = VERSION_10 | VERSION_13 | VERSION_NUMBER
@@ -164,8 +175,8 @@ module ErrorCodes = struct
   let message error_code = argon2_error_message error_code
 end
 
-let argon2i_hash_encoded =
-  foreign ~from:argon2_lib "argon2i_hash_encoded"
+let hash_encoded fun_name =
+  foreign ~from:argon2_lib fun_name
     ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
     @-> uint32_t (* parallelism *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
@@ -174,8 +185,8 @@ let argon2i_hash_encoded =
     @-> ptr char (* encoded *) @-> size_t (* encodedlen *)
     @-> returning ErrorCodes.t )
 
-let argon2i_hash_raw =
-  foreign ~from:argon2_lib "argon2i_hash_raw"
+let hash_raw fun_name =
+  foreign ~from:argon2_lib fun_name
     ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
     @-> uint32_t (* parallelism *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
@@ -183,24 +194,17 @@ let argon2i_hash_raw =
     (* saltlen *) @-> ptr void (* hash *)
     @-> size_t (* hashlen *) @-> returning ErrorCodes.t )
 
-let argon2d_hash_encoded =
-  foreign ~from:argon2_lib "argon2d_hash_encoded"
-    ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
-    @-> uint32_t (* parallelism *) @-> string
-    (* pwd *) @-> size_t (* pwdlen *)
-    @-> string (* salt *) @-> size_t
-    (* saltlen *) @-> size_t (* hashlen *)
-    @-> ptr char (* encoded *) @-> size_t (* encodedlen *)
-    @-> returning ErrorCodes.t )
+let argon2i_hash_encoded = hash_encoded "argon2i_hash_encoded"
 
-let argon2d_hash_raw =
-  foreign ~from:argon2_lib "argon2d_hash_raw"
-    ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
-    @-> uint32_t (* parallelism *) @-> string
-    (* pwd *) @-> size_t (* pwdlen *)
-    @-> string (* salt *) @-> size_t
-    (* saltlen *) @-> ptr void (* hash *)
-    @-> size_t (* hashlen *) @-> returning ErrorCodes.t )
+let argon2i_hash_raw = hash_raw "argon2i_hash_raw"
+
+let argon2d_hash_encoded = hash_encoded "argon2d_hash_encoded"
+
+let argon2d_hash_raw = hash_raw "argon2d_hash_raw"
+
+let argon2id_hash_encoded = hash_encoded "argon2id_hash_encoded"
+
+let argon2id_hash_raw = hash_raw "argon2id_hash_raw"
 
 let argon2_hash =
   foreign ~from:argon2_lib "argon2_hash"
@@ -213,17 +217,17 @@ let argon2_hash =
     @-> size_t (* encodedlen *) @-> Kind.t (* type *)
     @-> Version.t (* version *) @-> returning ErrorCodes.t )
 
-let argon2i_verify =
-  foreign ~from:argon2_lib "argon2i_verify"
+let verify fun_name =
+  foreign ~from:argon2_lib fun_name
     ( string (* encoded *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
     @-> returning ErrorCodes.t )
 
-let argon2d_verify =
-  foreign ~from:argon2_lib "argon2d_verify"
-    ( string (* encoded *) @-> string
-    (* pwd *) @-> size_t (* pwdlen *)
-    @-> returning ErrorCodes.t )
+let argon2i_verify = verify "argon2i_verify"
+
+let argon2d_verify = verify "argon2d_verify"
+
+let argon2id_verify = verify "argon2d_verify"
 
 let argon2_verify =
   foreign ~from:argon2_lib "argon2_verify"
@@ -380,6 +384,14 @@ module D = MakeInternal (struct
   let verify = argon2d_verify
 end)
 
+module ID = MakeInternal (struct
+  let hash_raw = argon2id_hash_raw
+
+  let hash_encoded = argon2id_hash_encoded
+
+  let verify = argon2id_verify
+end)
+
 type hash = string
 
 type encoded = string
@@ -416,15 +428,13 @@ let verify ~encoded ~pwd ~kind =
   | ErrorCodes.OK -> Result.Ok true
   | e -> Result.Error e
 
-let encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len =
+let encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len ~kind =
   let u_t_cost = Unsigned.UInt32.of_int t_cost in
   let u_m_cost = Unsigned.UInt32.of_int m_cost in
   let u_parallelism = Unsigned.UInt32.of_int parallelism in
   let u_salt_len = Unsigned.UInt32.of_int salt_len in
   let u_hash_len = Unsigned.UInt32.of_int hash_len in
   let len =
-    argon2_encodedlen u_t_cost u_m_cost u_parallelism u_salt_len u_hash_len
-      Kind.D
-    (* No difference between Kind.D and Kind.I *)
+    argon2_encodedlen u_t_cost u_m_cost u_parallelism u_salt_len u_hash_len kind
   in
   Unsigned.Size_t.to_int len

@@ -10,7 +10,7 @@ let () =
   let salt_len = String.length salt in
   let pwd = "password" in
   let encoded_len =
-    encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len
+    encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len ~kind:D
   in
   ( match I.hash_raw ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len with
   | Result.Ok hash ->

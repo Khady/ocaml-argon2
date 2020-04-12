@@ -87,11 +87,16 @@ module I : HashFunctions
 (** Bindings to Argon2d. *)
 module D : HashFunctions
 
+(** Bindings to Argon2id. *)
+module ID : HashFunctions
+
 type hash = string
 
 type encoded = string
 
-type kind = D | I
+type kind = D | I | ID
+
+val show_kind : [ `Upper | `Lower ] -> kind -> string
 
 type version =
   | VERSION_10
@@ -106,9 +111,7 @@ val hash :
   salt:string ->
   kind:kind ->
   hash_len:int ->
-  (* TODO: must be int option *)
   encoded_len:int ->
-  (* TODO: must be int option *)
   version:version ->
   (hash * encoded, ErrorCodes.t) Result.result
 (** Generic function underlying the above ones. *)
@@ -126,5 +129,6 @@ val encoded_len :
   parallelism:int ->
   salt_len:int ->
   hash_len:int ->
+  kind:kind ->
   int
 (** Returns the encoded hash length for the given input parameters. *)
