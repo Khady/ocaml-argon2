@@ -1,4 +1,4 @@
-## UNRELEASED
+## 1.0.0 (2020-04-12)
 
 - compatibility with libargon2 20171227 (#3)
 - change build system to dune (#3)

@@ -4,6 +4,7 @@ authors: "Louis Roché <louis@louisroche.net>"
 homepage: "https://github.com/Khady/ocaml-argon2"
 dev-repo: "git+https://github.com/Khady/ocaml-argon2.git"
 bug-reports: "https://github.com/Khady/ocaml-argon2/issues"
+doc: "https://khady.github.io/ocaml-argon2/"
 license: "MIT"
 depends: [
   "ocaml" {>= "4.02.3"}
@@ -18,3 +19,8 @@ build: [
   ["dune" "build" "-p" name "-j" jobs "@install" "@doc" {with-doc}]
 ]
 synopsis: "OCaml bindings to Argon2"
+description: """
+Based on argon2 library as described in https://github.com/P-H-C/phc-winner-argon2.
+
+libargon2 must be installed on your system for this library to work.
+"""
