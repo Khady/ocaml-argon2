@@ -57,7 +57,7 @@ module type HashFunctions = sig
     salt:string ->
     hash_len:int ->
     (hash, ErrorCodes.t) Result.result
-  (** Hashes a password with Argon2i, producing a raw hash. *)
+  (** Hashes a password, producing a raw hash. *)
 
   val hash_encoded :
     t_cost:int ->
@@ -68,7 +68,7 @@ module type HashFunctions = sig
     hash_len:int ->
     encoded_len:int ->
     (encoded, ErrorCodes.t) Result.result
-  (** Hashes a password with Argon2i, producing an encoded hash. *)
+  (** Hashes a password, producing an encoded hash. *)
 
   val verify :
     encoded:encoded -> pwd:string -> (bool, ErrorCodes.t) Result.result
