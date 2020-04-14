@@ -39,9 +39,7 @@ let () =
   | Result.Ok (hash, encoded) -> (
       message "hash argon2d:";
       String.iter (fun c -> Printf.printf "%02x" (Char.code c)) hash;
-      message "\nencoded argon2d:";
-      String.iter (fun c -> Printf.printf "%02x" (Char.code c)) encoded;
-      message "";
+      message "\nencoded argon2d:%s" encoded;
       match verify ~encoded ~pwd ~kind:D with
       | Result.Ok _ -> message "verify OK"
       | Result.Error e ->

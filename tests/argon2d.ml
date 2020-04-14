@@ -26,6 +26,18 @@ let hash_raw () =
       printf "Error while computing hash with argon2d_hash_raw: %s\n"
         (ErrorCodes.message e)
 
+let hash_encoded () =
+  let encoded_len =
+    encoded_len ~t_cost ~m_cost ~parallelism ~salt_len ~hash_len ~kind:D
+  in
+  match D.hash_encoded ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len ~encoded_len with
+  | Result.Ok hash ->
+      printf "argon2d encoded:%s\n" (D.encoded_to_string hash)
+  | Result.Error e ->
+      printf "Error while computing hash with argon2d_hash_encoded: %s\n"
+        (ErrorCodes.message e)
+
 let () =
   hash_raw ();
+  hash_encoded ();
   ()
