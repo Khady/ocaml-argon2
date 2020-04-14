@@ -41,9 +41,7 @@ let gen kind =
       msg "hash:\n";
       String.iter (fun c -> Printf.printf "%02x" (Char.code c)) hash;
       printf "\n";
-      msg "encoded:\n";
-      String.iter (fun c -> Printf.printf "%02x" (Char.code c)) encoded;
-      printf "\n";
+      msg "encoded:\n%s\n" encoded;
       match verify ~encoded ~pwd ~kind with
       | Result.Ok _ -> msg "verify OK\n"
       | Result.Error e ->
