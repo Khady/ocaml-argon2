@@ -1,3 +1,7 @@
+## 1.0.1 (2020-04-15)
+
+- fix wrong length of hash encoded (#5)
+
 ## 1.0.0 (2020-04-12)
 
 - compatibility with libargon2 20171227 (#3)
