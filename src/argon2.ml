@@ -1,9 +1,6 @@
 open Ctypes
 open Foreign
 
-let argon2_lib =
-  Dl.dlopen ~filename:"libargon2.so.1" ~flags:[ Dl.RTLD_NOW; Dl.RTLD_GLOBAL ]
-
 module Kind = struct
   type t = D | I | ID
 
@@ -18,7 +15,7 @@ module Kind = struct
   let t = view int ~read ~write
 
   let argon2_type2string =
-    foreign ~from:argon2_lib "argon2_type2string"
+    foreign "argon2_type2string"
       (t (* type *) @-> int (* uppercase *) @-> returning string)
 
   let show (case : [ `Upper | `Lower ]) t =
@@ -170,29 +167,29 @@ module ErrorCodes = struct
   let t = view int ~read ~write
 
   let argon2_error_message =
-    foreign ~from:argon2_lib "argon2_error_message" (t @-> returning string)
+    foreign "argon2_error_message" (t @-> returning string)
 
   let message error_code = argon2_error_message error_code
 end
 
 let hash_encoded fun_name =
-  foreign ~from:argon2_lib fun_name
-    ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
+  foreign fun_name
+    (uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
     @-> uint32_t (* parallelism *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
     @-> string (* salt *) @-> size_t
     (* saltlen *) @-> size_t (* hashlen *)
     @-> ptr char (* encoded *) @-> size_t (* encodedlen *)
-    @-> returning ErrorCodes.t )
+    @-> returning ErrorCodes.t)
 
 let hash_raw fun_name =
-  foreign ~from:argon2_lib fun_name
-    ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
+  foreign fun_name
+    (uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
     @-> uint32_t (* parallelism *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
     @-> string (* salt *) @-> size_t
     (* saltlen *) @-> ptr void (* hash *)
-    @-> size_t (* hashlen *) @-> returning ErrorCodes.t )
+    @-> size_t (* hashlen *) @-> returning ErrorCodes.t)
 
 let argon2i_hash_encoded = hash_encoded "argon2i_hash_encoded"
 
@@ -207,21 +204,21 @@ let argon2id_hash_encoded = hash_encoded "argon2id_hash_encoded"
 let argon2id_hash_raw = hash_raw "argon2id_hash_raw"
 
 let argon2_hash =
-  foreign ~from:argon2_lib "argon2_hash"
-    ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
+  foreign "argon2_hash"
+    (uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
     @-> uint32_t (* parallelism *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
     @-> string (* salt *) @-> size_t
     (* saltlen *) @-> ptr void (* hash *)
     @-> size_t (* hashlen *) @-> ptr char (* encoded *)
     @-> size_t (* encodedlen *) @-> Kind.t (* type *)
-    @-> Version.t (* version *) @-> returning ErrorCodes.t )
+    @-> Version.t (* version *) @-> returning ErrorCodes.t)
 
 let verify fun_name =
-  foreign ~from:argon2_lib fun_name
-    ( string (* encoded *) @-> string
+  foreign fun_name
+    (string (* encoded *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
-    @-> returning ErrorCodes.t )
+    @-> returning ErrorCodes.t)
 
 let argon2i_verify = verify "argon2i_verify"
 
@@ -230,17 +227,17 @@ let argon2d_verify = verify "argon2d_verify"
 let argon2id_verify = verify "argon2d_verify"
 
 let argon2_verify =
-  foreign ~from:argon2_lib "argon2_verify"
-    ( string (* encoded *) @-> string
+  foreign "argon2_verify"
+    (string (* encoded *) @-> string
     (* pwd *) @-> size_t (* pwdlen *)
-    @-> Kind.t (* type *) @-> returning ErrorCodes.t )
+    @-> Kind.t (* type *) @-> returning ErrorCodes.t)
 
 let argon2_encodedlen =
-  foreign ~from:argon2_lib "argon2_encodedlen"
-    ( uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
+  foreign "argon2_encodedlen"
+    (uint32_t (* t_cost *) @-> uint32_t (* m_cost *)
     @-> uint32_t (* parallelism *) @-> uint32_t (* saltlen *)
     @-> uint32_t (* hashlen *) @-> Kind.t
-    (* type *) @-> returning size_t )
+    (* type *) @-> returning size_t)
 
 let hash_encoded hash_fun ~t_cost ~m_cost ~parallelism ~pwd ~salt ~hash_len
     ~encoded_len =
