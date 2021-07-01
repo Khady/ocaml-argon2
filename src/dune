@@ -2,4 +2,12 @@
  (name argon2)
  (public_name argon2)
  (libraries result ctypes.foreign ctypes)
+ (flags
+  :standard
+  (:include flags.sexp))
  (synopsis "OCaml bindings to argon2"))
+
+(rule
+ (targets flags.sexp)
+ (action
+  (run ./config/discover.exe)))
