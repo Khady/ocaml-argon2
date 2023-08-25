@@ -224,7 +224,7 @@ let argon2i_verify = verify "argon2i_verify"
 
 let argon2d_verify = verify "argon2d_verify"
 
-let argon2id_verify = verify "argon2d_verify"
+let argon2id_verify = verify "argon2id_verify"
 
 let argon2_verify =
   foreign "argon2_verify"
