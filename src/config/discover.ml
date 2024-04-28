@@ -24,5 +24,6 @@ let () =
             | Some deps -> deps)
       in
 
-      concat_map (fun flag -> [ "-cclib"; flag ]) conf.libs
+      ([ "-ccopt"; "-Wl,--no-as-needed" ]) 
+      @ concat_map (fun flag -> [ "-cclib"; flag ]) conf.libs
       |> C.Flags.write_sexp "flags.sexp")
